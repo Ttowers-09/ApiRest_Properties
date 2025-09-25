@@ -12,6 +12,6 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     // Vamos acá añadir "funcionalidades" extras
 
     List <Property> findByLocation (String location);
-    List <Property> findPropertyBetwwenPrice (int minPrice, int maxPrice);
-    List <Property> findPropertyBetweenSize (Integer minSize, Integer maxSize);
+    List <Property> findByPriceBetween (int minPrice, int maxPrice);
+    List <Property> findBySizeBetween (Integer minSize, Integer maxSize);
 }

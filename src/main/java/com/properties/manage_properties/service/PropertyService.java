@@ -37,8 +37,8 @@ public class PropertyService {
         }
     }
 
-    public List <Property> findPropertyBetwwenPrice (int minPrice, int maxPrice) {
-        return propertyRepository.findPropertyBetwwenPrice(minPrice, maxPrice);
+    public List <Property> findPropertyBetweenPrice (int minPrice, int maxPrice) {
+        return propertyRepository.findByPriceBetween(minPrice, maxPrice);
     }
 
     public Property updateProperty (Long id, Property property) {
@@ -57,4 +57,7 @@ public class PropertyService {
 
     }
 
+    public List <Property> findPropertyBetweenSize (Integer minSize, Integer maxSize) {
+        return propertyRepository.findBySizeBetween(minSize, maxSize);
+    }
 }

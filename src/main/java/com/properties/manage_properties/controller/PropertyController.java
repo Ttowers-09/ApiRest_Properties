@@ -70,4 +70,29 @@ public class PropertyController {
         }
         return null;
     }
+
+    @GetMapping("/location/{location}")
+    public ResponseEntity<?> getByLocation(@PathVariable String location) {
+        if (location == null || location.isEmpty() || propertyService.findByLocation(location).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No properties found in location: " + location);
+        }
+        return ResponseEntity.ok(propertyService.findByLocation(location));
+    }
+
+    @GetMapping("/price-range/{minPrice}/{maxPrice}")
+    public ResponseEntity<?> getByPriceRange(@PathVariable int minPrice, @PathVariable int maxPrice) {
+        if (minPrice < 0 || maxPrice < 0 || minPrice > maxPrice || propertyService.findPropertyBetweenPrice(minPrice, maxPrice).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No properties found in the price range: " + minPrice + " - " + maxPrice);
+        }
+        return ResponseEntity.ok(propertyService.findPropertyBetweenPrice(minPrice, maxPrice));
+    }
+
+    @GetMapping("/size-range/{minSize}/{maxSize}")
+    public ResponseEntity<?> getBySizeRange(@PathVariable Integer minSize, @PathVariable Integer maxSize) {
+        if (minSize < 0 || maxSize < 0 || minSize > maxSize || propertyService.findPropertyBetweenSize(minSize, maxSize).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No properties found in the size range: " + minSize + " - " + maxSize);
+        }
+        return ResponseEntity.ok(propertyService.findPropertyBetweenSize(minSize, maxSize));
+    }
+
 }
