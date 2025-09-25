@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Administrador de Propiedades</title>
+  <style>
+    :root{
+      --accent:#4b90f2; --muted:#6c6c6c; --card-bg:#fff; --shadow:0 6px 18px rgba(15,15,15,.08); --radius:12px;
+      --danger:#e04b4b;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:#fff;color:#111}
+    .header{display:flex;align-items:center;justify-content:space-between;padding:28px 32px;border-bottom:1px solid #eee}
+    .branding{display:flex;gap:16px;align-items:center}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2858c8);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;box-shadow:var(--shadow)}
+    .title{display:flex;flex-direction:column}
+    .title h1{margin:0;font-size:20px}
+    .title p{margin:0;color:var(--muted);font-size:13px}
+    .btn{background:var(--accent);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid #e6f0ff}
+    .controls{display:flex;align-items:center;gap:12px;padding:20px 32px;flex-wrap:wrap}
+    .controls .searchBox{flex:1;min-width:240px;display:flex;gap:8px;align-items:center}
+    .controls input[type="text"],.controls input[type="number"]{flex:1;padding:12px 14px;border-radius:10px;border:1px solid #e8e8e8;font-size:14px}
+    .controls .smallBtn{padding:10px 12px;border-radius:10px;border:1px solid #ddd;background:#fff;cursor:pointer}
+    .container{padding:26px 32px;max-width:1100px;margin:0 auto}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;margin-top:18px}
+    .card{background:var(--card-bg);border-radius:12px;padding:18px;box-shadow:var(--shadow);border:1px solid #f1f1f1}
+    .card .header{display:flex;align-items:center;justify-content:space-between}
+    .card h3{margin:0;font-size:18px}
+    .meta{color:var(--muted);font-size:14px;margin-top:8px;display:flex;gap:12px;flex-wrap:wrap}
+    .price{font-weight:800;color:#0b6d2b}
+    .desc{margin-top:12px;color:#444;font-size:14px}
+    .filtersPanel{display:none;margin-top:16px;padding:18px;border-radius:12px;border:1px solid #eee;background:#fbfbfb}
+    .filtersRow{display:flex;gap:12px;flex-wrap:wrap}
+    .filterBox{flex:1;min-width:220px;padding:14px;border-radius:10px;border:1px dashed #eee;background:#fff}
+    .filterBox label{display:block;font-weight:700;margin-bottom:8px}
+    .activeFilters{margin-top:14px}
+    .tag{display:inline-block;padding:8px 12px;border-radius:999px;background:#eef3ff;color:#1a4aa4;margin-right:8px;font-weight:600;margin-top:6px}
+    .modalBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:40}
+    .modal{width:min(680px,96%);background:#fff;border-radius:14px;padding:20px;box-shadow:0 18px 50px rgba(10,10,10,.25)}
+    .formRow{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+    .formGroup{flex:1;min-width:160px;display:flex;flex-direction:column}
+    .formGroup label{font-weight:700;margin-bottom:6px;font-size:13px}
+    .formGroup input,.formGroup textarea{padding:10px 12px;border-radius:8px;border:1px solid #e6e6e6;font-size:14px;resize:vertical}
+    .formGroup textarea{min-height:90px}
+    .error{color:var(--danger);font-size:13px;margin-top:6px}
+    .modalFooter{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+    .muted{color:var(--muted);font-size:13px}
+    .clearBtn{background:transparent;border:1px solid #ddd;padding:8px 10px;border-radius:8px;cursor:pointer}
+    .empty{padding:30px;border-radius:12px;text-align:center;border:1px dashed #eee;color:var(--muted)}
+    .deleteBtn {
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background 0.2s;
+    }
+    .deleteBtn:hover {
+      background: #b92d2d;
+    }
+    @media (max-width:520px){.title h1{font-size:18px}.controls{padding:12px}}
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="branding">
+      <div class="logo">AP</div>
+      <div class="title">
+        <h1>Administrador de Propiedades</h1>
+        <p>Gestiona tu portafolio inmobiliario</p>
+      </div>
+    </div>
+    <div><button id="btnNew" class="btn">+ Nueva Propiedad</button></div>
+  </header>
+
+
+  <section class="controls container">
+    <div class="searchBox">
+      <input id="searchById" type="text" placeholder="Buscar por ID de propiedad..." />
+      <button id="btnSearch" class="smallBtn">Buscar</button>
+      <button id="btnClearSearch" class="smallBtn">Ver Todas</button>
+    </div>
+    <button id="toggleFilters" class="smallBtn">Filtros</button>
+  </section>
+
+
+  <main class="container">
+    <div id="filtersPanel" class="filtersPanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="margin:0">Filtros de Búsqueda</h3>
+        <div><button id="btnClearFilters" class="clearBtn">Limpiar Filtros</button></div>
+      </div>
+
+      <div class="filtersRow" style="margin-top:12px;">
+        <div class="filterBox">
+          <label>Rango de Precio ($)</label>
+          <div style="display:flex;gap:8px;">
+            <input id="priceMin" type="number" placeholder="Mín" />
+            <input id="priceMax" type="number" placeholder="Máx" />
+          </div>
+        </div>
+        <div class="filterBox">
+          <label>Rango de Tamaño (m²)</label>
+          <div style="display:flex;gap:8px;">
+            <input id="sizeMin" type="number" placeholder="Mín" />
+            <input id="sizeMax" type="number" placeholder="Máx" />
+          </div>
+        </div>
+      </div>
+
+      <div class="activeFilters">
+        <span class="muted">Filtros Activos:</span>
+        <div id="activeBadges" style="margin-top:8px;"></div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;">
+        <button id="applyFilters" class="btn">Aplicar Filtros</button>
+      </div>
+    </div>
+
+
+    <div id="propertiesList" class="cards" style="margin-top:18px;"></div>
+    <div id="emptyState" class="empty" style="display:none;margin-top:18px;">No hay propiedades aún.</div>
+  </main>
+
+
+  <div id="modalBackdrop" class="modalBackdrop" role="dialog" aria-hidden="true">
+    <div class="modal" role="document">
+      <h2>Nueva Propiedad</h2>
+      <p class="muted">Rellena todos los campos.</p>
+
+      <div class="formRow">
+        <div class="formGroup">
+          <label for="inputDireccion">Dirección</label>
+          <input id="inputDireccion" type="text" />
+          <div class="error" id="errDireccion"></div>
+        </div>
+        <div class="formGroup">
+          <label for="inputPrecio">Precio ($)</label>
+          <input id="inputPrecio" type="text" placeholder="250000" />
+          <div class="error" id="errPrecio"></div>
+        </div>
+      </div>
+
+      <div class="formRow">
+        <div class="formGroup">
+          <label for="inputTamano">Tamaño (m²)</label>
+          <input id="inputTamano" type="text" placeholder="120" />
+          <div class="error" id="errTamano"></div>
+        </div>
+        <div class="formGroup">
+          <label for="inputLocacion">Locación</label>
+          <input id="inputLocacion" type="text" />
+          <div class="error" id="errLocacion"></div>
+        </div>
+      </div>
+
+      <div class="formRow">
+        <div class="formGroup" style="flex:1;">
+          <label for="inputDueno">Dueño actual</label>
+          <input id="inputDueno" type="text" />
+          <div class="error" id="errDueno"></div>
+        </div>
+        <div class="formGroup" style="flex:1;">
+          <label for="inputDesc">Descripción</label>
+          <textarea id="inputDesc" placeholder="Descripción breve"></textarea>
+          <div class="error" id="errDesc"></div>
+        </div>
+      </div>
+
+      <div class="modalFooter">
+        <button id="btnCancel" class="clearBtn">Cancelar</button>
+        <button id="btnCreate" class="btn">Crear Propiedad</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    const API_BASE = '/api/v1/properties';
+
+    async function api(path, options = {}) {
+      const res = await fetch(`${API_BASE}${path}`, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options
+      });
+      if (!res.ok) {
+        let err;
+        try { err = await res.json(); } catch { err = { message: res.statusText }; }
+        throw new Error(err.message || `HTTP ${res.status}`);
+      }
+      return res.status === 204 ? null : res.json();
+    }
+
+
+    let currentViewList = [];
+
+    const btnNew = document.getElementById('btnNew');
+    const modal = document.getElementById('modalBackdrop');
+    const btnCancel = document.getElementById('btnCancel');
+    const btnCreate = document.getElementById('btnCreate');
+
+    const inputDireccion = document.getElementById('inputDireccion');
+    const inputPrecio = document.getElementById('inputPrecio');
+    const inputTamano = document.getElementById('inputTamano');
+    const inputLocacion = document.getElementById('inputLocacion');
+    const inputDueno = document.getElementById('inputDueno');
+    const inputDesc = document.getElementById('inputDesc');
+
+    const errDireccion = document.getElementById('errDireccion');
+    const errPrecio = document.getElementById('errPrecio');
+    const errTamano = document.getElementById('errTamano');
+    const errLocacion = document.getElementById('errLocacion');
+    const errDueno = document.getElementById('errDueno');
+    const errDesc = document.getElementById('errDesc');
+
+    const propertiesList = document.getElementById('propertiesList');
+    const emptyState = document.getElementById('emptyState');
+
+    const searchById = document.getElementById('searchById');
+    const btnSearch = document.getElementById('btnSearch');
+    const btnClearSearch = document.getElementById('btnClearSearch');
+
+    const toggleFilters = document.getElementById('toggleFilters');
+    const filtersPanel = document.getElementById('filtersPanel');
+    const priceMin = document.getElementById('priceMin');
+    const priceMax = document.getElementById('priceMax');
+    const sizeMin = document.getElementById('sizeMin');
+    const sizeMax = document.getElementById('sizeMax');
+    const applyFilters = document.getElementById('applyFilters');
+    const btnClearFilters = document.getElementById('btnClearFilters');
+    const activeBadges = document.getElementById('activeBadges');
+
+
+    btnNew.addEventListener('click', openModal);
+    btnCancel.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    function openModal(){
+      clearFormErrors();
+      inputDireccion.value = inputPrecio.value = inputTamano.value = '';
+      inputLocacion.value = inputDueno.value = inputDesc.value = '';
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+    }
+    function closeModal(){
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden','true');
+    }
+
+
+    function clearFormErrors(){ [errDireccion,errPrecio,errTamano,errLocacion,errDueno,errDesc].forEach(el => el.textContent=''); }
+    function isOnlyDigits(str){ return /^\d+$/.test(String(str).trim()); }
+
+    function validateForm(){
+      clearFormErrors();
+      let ok = true;
+
+      const direccion = inputDireccion.value.trim();
+      const precioRaw = inputPrecio.value.trim();
+      const tamanoRaw = inputTamano.value.trim();
+      const locacion = inputLocacion.value.trim();
+      const dueno = inputDueno.value.trim();
+      const desc = inputDesc.value.trim();
+
+      if(!direccion){ errDireccion.textContent='La dirección es obligatoria.'; ok=false; }
+
+      const precioNum = Number(precioRaw.replace(/[,.\s]/g,''));
+      if(!precioRaw){ errPrecio.textContent='El precio es obligatorio.'; ok=false; }
+      else if(!isFinite(precioNum) || precioNum<=0){ errPrecio.textContent='Precio inválido.'; ok=false; }
+
+      const tamanoNum = Number(tamanoRaw.replace(/[,.\s]/g,''));
+      if(!tamanoRaw){ errTamano.textContent='El tamaño es obligatorio.'; ok=false; }
+      else if(!isFinite(tamanoNum) || tamanoNum<=0){ errTamano.textContent='Tamaño inválido.'; ok=false; }
+
+      if(!locacion){ errLocacion.textContent='La locación es obligatoria.'; ok=false; }
+      if(!dueno){ errDueno.textContent='El dueño actual es obligatorio.'; ok=false; }
+      else if(isOnlyDigits(dueno)){ errDueno.textContent='El dueño no puede ser solo números.'; ok=false; }
+
+      if(!desc){ errDesc.textContent='La descripción es obligatoria.'; ok=false; }
+
+      return { ok, direccion, precioNum, tamanoNum, locacion, dueno, desc };
+    }
+
+    const fetchAll = () => api('', { method:'GET' });
+    const fetchById = (id) => api(`/${id}`, { method:'GET' });
+    const fetchByPriceRange = (min,max) => api(`/price-range/${min}/${max}`, { method:'GET' });
+    const fetchBySizeRange  = (min,max) => api(`/size-range/${min}/${max}`, { method:'GET' });
+    const createProperty = (dto) => api('', { method:'POST', body:JSON.stringify(dto) });
+    const deleteProperty = (id) => api(`/${id}`, { method:'DELETE' });
+
+
+    btnCreate.addEventListener('click', async () => {
+      const v = validateForm();
+      if(!v.ok) return;
+      const dto = {
+        address: v.direccion,
+        price: v.precioNum,
+        size: v.tamanoNum,
+        location: v.locacion,
+        actualOwner: v.dueno,
+        description: v.desc
+      };
+      try{
+        await createProperty(dto);
+        closeModal();
+        await loadAndRenderAll();
+      }catch(e){ alert(`Error al crear: ${e.message}`); }
+    });
+
+
+    function moneyFormat(n){ return Number(n).toLocaleString('es-CO'); }
+    function escapeHtml(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function renderList(list){
+      currentViewList = [...list];
+      propertiesList.innerHTML = '';
+      if(!list.length){ emptyState.style.display='block'; return; }
+      emptyState.style.display='none';
+
+      list.forEach(p=>{
+        const card = document.createElement('div'); card.className='card';
+        const title = (p.address||'').split(',')[0] || `Propiedad #${p.id}`;
+        card.innerHTML = `
+          <div class="header">
+            <div>
+              <h3>${escapeHtml(title)}</h3>
+              <div class="muted">${escapeHtml(p.address||'')}</div>
+            </div>
+            <div>
+              <button class="smallBtn deleteBtn" data-del="${p.id}">Eliminar</button>
+            </div>
+          </div>
+          <div class="meta">
+            <div class="property-id"><span style="background:#e6f0ff;color:#2858c8;padding:3px 10px;border-radius:8px;font-size:13px;font-weight:700;">Id: ${p.id}</span></div>
+            <div class="price">$ ${moneyFormat(p.price)}</div>
+            <div>•</div>
+            <div>${p.size} m²</div>
+            <div>•</div>
+            <div>${escapeHtml(p.location||'')}</div>
+          </div>
+          <div class="desc">${escapeHtml(p.description||'')}</div>
+        `;
+        propertiesList.appendChild(card);
+      });
+
+
+      propertiesList.querySelectorAll('[data-del]').forEach(btn=>{
+        btn.addEventListener('click', async (e)=>{
+          const id = e.currentTarget.getAttribute('data-del');
+          if(!confirm(`¿Eliminar propiedad #${id}?`)) return;
+          try{ await deleteProperty(id); await loadAndRenderAll(); }
+          catch(err){ alert(`No se pudo eliminar: ${err.message}`); }
+        });
+      });
+    }
+
+
+    btnSearch.addEventListener('click', async ()=>{
+      const q = searchById.value.trim();
+      if(!q){ alert('Ingresa un ID para buscar.'); return; }
+      if(!/^\d+$/.test(q)){ alert('El ID debe ser numérico.'); return; }
+      try{
+        const item = await fetchById(Number(q));
+        renderList(item ? [item] : []);
+      }catch{ renderList([]); }
+    });
+    btnClearSearch.addEventListener('click', async ()=>{
+      searchById.value='';
+      await loadAndRenderAll();
+    });
+
+
+    toggleFilters.addEventListener('click', ()=>{
+      filtersPanel.style.display = (filtersPanel.style.display==='block') ? 'none' : 'block';
+      updateActiveBadges();
+    });
+    function makeBadge(text){ const el=document.createElement('span'); el.className='tag'; el.textContent=text; return el; }
+    function updateActiveBadges(){
+      const pMin=Number(priceMin.value)||null, pMax=Number(priceMax.value)||null,
+            sMin=Number(sizeMin.value)||null, sMax=Number(sizeMax.value)||null;
+      const box = document.getElementById('activeBadges'); box.innerHTML='';
+      if(pMin) box.appendChild(makeBadge(`Precio min: $${moneyFormat(pMin)}`));
+      if(pMax) box.appendChild(makeBadge(`Precio max: $${moneyFormat(pMax)}`));
+      if(sMin) box.appendChild(makeBadge(`Tamaño min: ${sMin} m²`));
+      if(sMax) box.appendChild(makeBadge(`Tamaño max: ${sMax} m²`));
+      if(!pMin && !pMax && !sMin && !sMax) box.innerHTML='<span class="muted">— ninguno —</span>';
+    }
+    btnClearFilters.addEventListener('click', async ()=>{
+      priceMin.value=priceMax.value=sizeMin.value=sizeMax.value='';
+      updateActiveBadges(); await loadAndRenderAll();
+    });
+    applyFilters.addEventListener('click', async ()=>{
+      const pMin=Number(priceMin.value)||null, pMax=Number(priceMax.value)||null,
+            sMin=Number(sizeMin.value)||null, sMax=Number(sizeMax.value)||null;
+      try{
+        if(pMin && pMax)      renderList(await fetchByPriceRange(pMin,pMax));
+        else if(sMin && sMax) renderList(await fetchBySizeRange(sMin,sMax));
+        else                  await loadAndRenderAll();
+        updateActiveBadges();
+      }catch(e){ alert(`Error aplicando filtros: ${e.message}`); }
+    });
+
+
+    async function loadAndRenderAll(){
+      try{
+        const list = await fetchAll();
+        renderList(Array.isArray(list) ? list : []);
+      }catch(e){
+        propertiesList.innerHTML=''; emptyState.style.display='block'; console.error(e);
+      }
+    }
+    loadAndRenderAll();
+  </script>
+</body>
+</html>

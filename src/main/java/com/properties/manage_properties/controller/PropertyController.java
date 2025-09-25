@@ -64,11 +64,11 @@ public class PropertyController {
     public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
             propertyService.deleteById(id);
+            return ResponseEntity.noContent().build();   
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Property id " + id + " not found");
         }
-        return null;
     }
 
     @GetMapping("/location/{location}")

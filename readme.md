@@ -17,6 +17,7 @@
         - Validation:
         - MySQL Driver:
 
+![Inicialización de proyecto](src/main/resources/readmeImg/SpringInitializr.png)
 # Arquitectura de nuestro Backend:
 
 - **model (Clase):**
