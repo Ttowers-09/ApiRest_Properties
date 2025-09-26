@@ -197,7 +197,7 @@ Para ejecutar nuestro proyecto hacemos lo siguiente:
 - **Listar propiedades por rangos de precios:**
  ![Imagen rango1](src/main/resources/readmeImg/rango1.png)
 
-![Imagen rango2](src/main/resources/readmeImg/rango2.png)
+    ![Imagen rango2](src/main/resources/readmeImg/rango2.png)
 
 - **Listar propiedades por rango de tamaño:**
 ![Imagen rango1](src/main/resources/readmeImg/size1.png)
@@ -207,3 +207,131 @@ Para ejecutar nuestro proyecto hacemos lo siguiente:
 ![Imagen rango1](src/main/resources/readmeImg/delete1.png)
 ![Imagen rango2](src/main/resources/readmeImg/delete2.png)
 
+
+# Proceso para dezplegar con AWS
+
+1- Creamos nuestra instancia en una maquina UBUNTU, la Instancia EC2 se llamará "Database_Instance"
+![Imagen Crear instancia](src/main/resources/aws/1.png)
+
+2- Luego creamos y descargamos las llaves de seguridad (Importante saber donde se guardan porque más adelante se van a necesitar), además de eso escogemos un grupo de seguridad, para este ejercicio cree uno llamado Security_Group_Databasa_Arep
+![Imagen Crear instancia](src/main/resources/aws/2.png)
+3- Configuramos nuestro almacenamiento.
+![Imagen Crear instancia](src/main/resources/aws/3.png)
+4- Lanzamos nuestra instancia y esperamos que esta se cree.
+![Imagen Crear instancia](src/main/resources/aws/4.png)
+![Imagen Crear instancia](src/main/resources/aws/5.png)
+5- En nuestro grupo de seguridad Security_Group_Databasa_Arep, cambiamos las reglas de entrada, alli permitimo el trafico de MYSQL/AURORA por el puerto 3306, permitimos el trafico SSH por el puerto 22 y permitimos el trafico TCP por el puerto 8080.
+![Imagen Crear instancia](src/main/resources/aws/6.png)
+6- Verificamos las reglas de entradas.
+![Imagen Crear instancia](src/main/resources/aws/7.png)
+7- Nos dirigmos nuevamente a nuestra instancia, en la parte superior veremos el boton donde dice "Conectar", alli nos ditrigimos a la ventana "Cliente SSH" y copiaremos el link que dice Ejemplo:
+![Imagen Crear instancia](src/main/resources/aws/8.png)
+8- Nos dirigimos a nuestra máquina local en la carpeta donde tenemos nuestras llave previamente, alli copiaremos el link anteriormente copiado.
+![Imagen Crear instancia](src/main/resources/aws/9.png)
+9- Esperamos que cargue.
+![Imagen Crear instancia](src/main/resources/aws/10.png)
+10- Actualizamos los paquetes de nuestra máquina de Ubuntu
+![Imagen Crear instancia](src/main/resources/aws/11.png)
+11- Esperamos a que termine de procesar.
+![Imagen Crear instancia](src/main/resources/aws/12.png)
+12- Instalamos MySQL en UBUNTU
+![Imagen Crear instancia](src/main/resources/aws/13.png)
+13- Esperamos a que termine de procesar.
+![Imagen Crear instancia](src/main/resources/aws/14.png)
+14- Establecemos la conexión a nuestra base de datos, mediante el puerto 3306 y el user que es admin previamente definido.
+![Imagen Crear instancia](src/main/resources/aws/15.png)
+15- Introducimos la contraseña creada en la instancia y verificamos que continue con normalidad.
+![Imagen Crear instancia](src/main/resources/aws/16.png)
+16- Dentro de mySql creamos la base de datos para este caso lo llamaremos "propertiesDataBase"
+![Imagen Crear instancia](src/main/resources/aws/17.png)
+17- Verificamos.
+![Imagen Crear instancia](src/main/resources/aws/18.png)
+18- En nuestro entorno local actualizaremos nuestro documento application.properties, alli se mantiene la conexión a la base de datos y nuestras credenciales.
+![Imagen Crear instancia](src/main/resources/aws/19.png)
+19- En nuestra base de datos verificamos la creación de las tablas.
+![Imagen Crear instancia](src/main/resources/aws/20.png)
+20- Ejecutamos nuestro proyecto en localHost en el browser, alli hacemos un ejemplo de uso, y luego verificamos en la consola y verificamos que si se halla registrado.
+![Imagen Crear instancia](src/main/resources/aws/21.png)
+Luego de comprobar la conexión lo vamos a montar en nuestra instancia EC2
+21- Actualizamos nuevamente los paquetes de nuestra maquina.
+![Imagen Crear instancia](src/main/resources/aws/23.png)
+22-Esperamos que cargue.
+![Imagen Crear instancia](src/main/resources/aws/24.png)
+23-Procedemos a descargar todo el paquete de Jaca, maven y JDK21
+![Imagen Crear instancia](src/main/resources/aws/25.png)
+24-Permitimos el trafico SSH por el puerto 22, por el puerto 8080, luego activamos el firewall y aplicamos las reglas ya hechas.
+![Imagen Crear instancia](src/main/resources/aws/26.png)
+25-Creamos la ruta /opt/app/env el -p sirve para crear toda la rura en caso que no exista, Luego creamos el archivo backend.env con las variables de entorno y por ultimo solo permisos de lectura.
+![Imagen Crear instancia](src/main/resources/aws/27.png)
+26-Otorgamos la propiedad a Ubunto para no estar utilizando el sudo, accedemos a la carpeta y alli clonamos nuestro repositorio.
+![Imagen Crear instancia](src/main/resources/aws/28.png)
+27- Accedemos a la carpeta de nuestro repositorio y alli ejecutamos el proyecto sin ejecutar los Test con el fin de generar el .jar
+![Imagen Crear instancia](src/main/resources/aws/29.png)
+28-Esperamos a que cargue
+![Imagen Crear instancia](src/main/resources/aws/30.png)
+![Imagen Crear instancia](src/main/resources/aws/31.png)
+29- Luego de estar compilado, entramos a la carpeta target, listamos los elementos y alli vizualizaremos el tar, luego lo ejecutamos.
+![Imagen Crear instancia](src/main/resources/aws/32.png)
+30-Empezara a cargar.
+![Imagen Crear instancia](src/main/resources/aws/33.png)
+31- Accedemos a nuestro browser con la IP publica de nuestra instancia.
+![Imagen Crear instancia](src/main/resources/aws/34.png)
+
+
+# Estructura de nuestro proyecto:
+```
+C:.
+├───.mvn
+│   └───wrapper
+├───src
+│   ├───main
+│   │   ├───java
+│   │   │   └───com
+│   │   │       └───properties
+│   │   │           └───manage_properties
+│   │   │               ├───controller
+│   │   │               ├───model
+│   │   │               ├───repository
+│   │   │               └───service
+│   │   └───resources
+│   │       ├───aws
+│   │       ├───readmeImg
+│   │       ├───static
+│   │       └───templates
+│   └───test
+│       └───java
+│           └───com
+│               └───properties
+│                   └───manage_properties
+└───target
+    ├───classes
+    │   ├───aws
+    │   ├───com
+    │   │   └───properties
+    │   │       └───manage_properties
+    │   │           ├───controller
+    │   │           ├───model
+    │   │           ├───repository
+    │   │           └───service
+    │   ├───readmeImg
+    │   └───static
+    ├───generated-sources
+    │   └───annotations
+    ├───generated-test-sources
+    │   └───test-annotations
+    ├───maven-archiver
+    ├───maven-status
+    │   └───maven-compiler-plugin
+    │       ├───compile
+    │       │   └───default-compile
+    │       └───testCompile
+    │           └───default-testCompile
+    └───test-classes
+        └───com
+            └───properties
+                └───manage_properties
+```
+
+# Video:
+
+https://1drv.ms/f/c/a0a575a235eb8a36/Et4ceMAdkSNGrB0kqkh1umABRhLPZ-yCWjsvsgfXQ7S8hQ?e=qQcbCf
