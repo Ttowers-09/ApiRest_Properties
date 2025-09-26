@@ -181,18 +181,18 @@ Para ejecutar nuestro proyecto hacemos lo siguiente:
 - Para terminar la ejecución: Ctrl + c
 
 # Pruebas realizadas en postman
-- **Buscar propeidad por Id:**
-![Captura Imagen busqueda por Id](src\main\resources\readmeImg\FindId.png)
+- **Buscar propiedad por Id:**
+![Captura Imagen busqueda por Id](src/main/resources/readmeImg/FindId.png)
 
 
 - **Buscar por locación:**
-![Captura Imagen busqueda por Locación](src\main\resources\readmeImg\findLocation.png)
+![Captura Imagen busqueda por Locación](src/main/resources/readmeImg/findLocation.png)
 
 - **Obtener todas las propiedades:**
-![Captura Imagen todas las propiedades](src\main\resources\readmeImg\getAll.png)
+![Captura Imagen todas las propiedades](src/main/resources/readmeImg/getAll.png)
 
 - **Crear una propiedad:**
-![Captura Imagen crear una propiedad](src\main\resources\readmeImg\post.png)
+![Captura Imagen crear una propiedad](src/main/resources/readmeImg/post.png)
 
 - **Listar propiedades por rangos de precios:**
  ![Imagen rango1](src/main/resources/readmeImg/rango1.png)
