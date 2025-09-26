@@ -155,7 +155,7 @@ utilizamos el plugin de lombook para evitar realizar getters, setters y construc
 - Traida la imagen se creo un contenedor para ser utilizado.
 - El contenedor se levantó de manera correcta y se implemento en segundo plano.
 
-![Captura Imagen Procedimiento Docker](src\main\resources\readmeImg\Verificacion_Docker.png)
+![Captura Imagen Procedimiento Docker](src/main/resources/readmeImg/Verificacion_Docker.png)
 
 # application.yml
 - Archivo importante ubicado en la ruta:
