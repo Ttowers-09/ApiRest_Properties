@@ -207,6 +207,10 @@ Para ejecutar nuestro proyecto hacemos lo siguiente:
 ![Imagen rango1](src/main/resources/readmeImg/delete1.png)
 ![Imagen rango2](src/main/resources/readmeImg/delete2.png)
 
+- **Actualizar una propiedad:**
+![Imagen rango1](src/main/resources/readmeImg/act1.png)
+![Imagen rango1](src/main/resources/readmeImg/act2.png)
+![Imagen rango1](src/main/resources/readmeImg/act3.png)
 
 # Proceso para dezplegar con AWS
 
